@@ -59,10 +59,10 @@ def adjust_date_range(driver, date_range):
     index = ['', 'All', '1', '2-7', '8-14', '15-30'].index(date_range)
 
     button_path = "html/body/div[3]/div/div[2]/div[1]/div[4]/form/div/ul/li" \
-                                "[3]/fieldset/button"
+                  "[3]/fieldset/button"
 
     date_path = "html/body/div[3]/div/div[2]/div[1]/div[4]/form/div/ul/li" \
-                            "[3]/fieldset/div/ol/li[{}]/div/label".format(index)
+                "[3]/fieldset/div/ol/li[{}]/div/label".format(index)
 
     attempts = 1
     while True:
@@ -89,7 +89,8 @@ def adjust_search_radius(driver, search_radius):
 
     if search_radius == '50': return
 
-    distance_selector = "select#advs-distance > option[value='{}']".format(search_radius)
+    distance_selector = "select#advs-distance > option[value='{}']"
+    distance_selector = distance_selector.format(search_radius)
 
     try:
         driver.find_element_by_css_selector(distance_selector).click()
@@ -115,8 +116,9 @@ def adjust_salary_range(driver, salary):
     salary_button = "html/body/div[3]/div/div[2]/div[1]/div[4]/form/div/ul/" \
                                     "li[4]/fieldset/button"
 
-    salary_path = "html/body/div[3]/div/div[2]/div[1]/div[4]/form/div/ul/" \
-                                "li[4]/fieldset/div[1]/ol/li[{}]/div/label".format(index)
+    salary_path = "html/body/div[3]/div/div[2]/div[1]/div[4]/" \
+                  "form/div/ul/li[4]/fieldset/div[1]/ol/li[{}" \
+                  "]/div/label".format(index)
 
     attempts = 1
     while True:
@@ -316,7 +318,8 @@ def next_results_page(driver, delay):
     else:
         # wait until the first job post button has loaded
         first_job_button = "li.mod.result.idx1.job div.bd " \
-                            "div.srp-actions.blue-button a.primary-action-button.label"
+                            "div.srp-actions.blue-button a" \
+                            ".primary-action-button.label"
 
         # wait for the first job post button to load
         wait_for_clickable_element(driver, delay, first_job_button)
@@ -341,7 +344,8 @@ def go_to_specific_results_page(driver, delay, page_number):
 
             next_results_page(driver, delay)
             print("\n**************************************************")
-            print("\n\n\nNavigating to results page {}\n\n\n".format(results_page))
+            print("\n\n\nNavigating to results page {}" \
+                  "\n\n\n".format(results_page))
 
         except ValueError:
 
@@ -447,11 +451,12 @@ class LIClient(object):
         # Click the Jobs search page
         jobs_link_clickable = False
         attempts = 1
+        url = "https://www.linkedin.com/jobs/?trk=nav_responsive_sub_nav_jobs"
 
         while not jobs_link_clickable:
 
             try:
-                self.driver.get("https://www.linkedin.com/jobs/?trk=nav_responsive_sub_nav_jobs")
+                self.driver.get(url)
 
             except Exception as e:
                 attempts += 1
@@ -491,9 +496,11 @@ class LIClient(object):
         elem.send_keys(Keys.RETURN)
 
         time.sleep(3)
+
+        selector = "div.search-info p strong"
+
         try:
-            num_results = driver.find_element_by_css_selector(
-                                                                    "div.search-info p strong").text
+            num_results = driver.find_element_by_css_selector(selector).text
         except Exception as e:
             num_results = ''
             pass
@@ -552,19 +559,21 @@ class LIClient(object):
                 # define the css selector for the blue 'View' button for job i
                 job_selector = list_element_tag + str(i) + button_tag
 
-                if search_suggestion_box_is_present(driver, job_selector, i, results_page):
+                if search_suggestion_box_is_present(driver, 
+                                            job_selector, i, results_page):
                     continue
 
                 # wait for the selector for the next job posting to load.
                 # if on last results page, then throw exception as job_selector 
                 # will not be detected on the page
-                if not link_is_present(driver, delay, job_selector, i, results_page):
+                if not link_is_present(driver, delay, 
+                                         job_selector, i, results_page):
                     continue
 
                 robust_wait_for_clickable_element(driver, delay, job_selector)
                 
-                extract_transform_load(driver, delay, job_selector, date, 
-                                                                                job, location, self.filename)
+                extract_transform_load(driver, 
+                    delay, job_selector, date, job, location, self.filename)
 
 
             # attempt to navigate to the next page of search results
@@ -575,7 +584,8 @@ class LIClient(object):
                 next_results_page(driver, delay)
 
                 print("\n**************************************************")
-                print("\n\n\nNavigating to results page  {}\n\n\n".format(results_page + 1))
+                print("\n\n\nNavigating to results page  {}" \
+                      "\n\n\n".format(results_page + 1))
 
             except ValueError:
 

@@ -291,19 +291,17 @@ def scrape_page(driver, **kwargs):
     Returns data as a dictionary
     """
 
-    # wait 1 second for elements to be dynamically rendered
+    # wait ~1 second for elements to be dynamically rendered
     time.sleep(1.2)
 
     start = time.time()
 
     containers = [
-        "section#top-card div.content",                            # job content
-        # "div.insights-container",                                  # company insights container
-        "div.job-salary-container",                                # job salary
-        "ul.company-growth-stats.stats-list",                      # company stats
-        # "table.applicants-education-table.comparison-table",       # applicants education
-        "div.insights-card.applicants-skills",                     # applicants skills
-        "div.applicants-locations-list"                            # applicants locations
+        "section#top-card div.content",            # job content
+        "div.job-salary-container",                # job salary
+        "ul.company-growth-stats.stats-list",      # company stats
+        "div.insights-card.applicants-skills",     # applicants skills
+        "div.applicants-locations-list"            # applicants locations
     ]
 
     for container in containers:
