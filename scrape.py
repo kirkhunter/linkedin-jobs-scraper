@@ -190,7 +190,8 @@ def num_applicants(driver):
 def applicants_education(driver):
     """return dictionary of applicant education levels"""
 
-    education_selector = "table.applicants-education-table.comparison-table tbody tr"
+    education_selector = "table.applicants-education-table." \
+                         "comparison-table tbody tr"
 
     try:
 
