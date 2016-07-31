@@ -8,7 +8,7 @@ But if one were to scrape LinkedIn job postings using selenium webdriver with ac
 
 This module requires python bindings for the selenium webdriver
 ```bash
-pip install selenium
+$ pip install selenium
 ```
 
 
