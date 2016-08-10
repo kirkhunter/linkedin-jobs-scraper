@@ -1,6 +1,6 @@
 # LinkedIn Jobs Scaper
 
-First, I do not condone scraping LinkedIn data in any way. Anyone who wishes to do so should first read LinkedIn's statement on their [prohibition of scraping software](https://www.linkedin.com/help/linkedin/answer/56347/prohibition-of-scraping-software?lang=en).
+First, I do not condone scraping LinkedIn data in any way. Anyone who wishes to do so should first read LinkedIn's statement on their <a href="https://www.linkedin.com/help/linkedin/answer/56347/prohibition-of-scraping-software?lang=en" target="_blank">prohibition of scraping software</a>.
 
 
 But if one were to scrape LinkedIn job postings using selenium webdriver with access to premium user insights, say, then this repository serves as a collection of tools that one might find useful. I found the selenium webdriver to be key in this process, as LI dynamically renders their pages with node.js, using a tool like BeautifulSoup will grab the initial JavaScript code but not the data that is displayed on the page. Also, note that LinkedIn actively suspends accounts due to excessive page views.
@@ -8,7 +8,7 @@ But if one were to scrape LinkedIn job postings using selenium webdriver with ac
 
 This module requires python bindings for the selenium webdriver
 ```bash
-pip install selenium
+$ pip install selenium
 ```
 
 
