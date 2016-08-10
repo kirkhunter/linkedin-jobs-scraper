@@ -12,28 +12,21 @@ import json
 import time
 
 
-
-
 def write_line_to_file(filename, data):
     """
     output the current job title, company, job id, then write
     the scraped data to file
     """
-
     job_title = data["job_info"]["job_title"]
     company   = data["job_info"]["company"]
     job_id    = data["job_info"]["job_id"]
-
     message = u"Writing data to file for job listing:"
     message += "\n  {}  {};   job id  {}\n"
-
     try:
         print(message.format(job_title, company, job_id))
     except Exception as e:
         print("Encountered a unicode encode error while attempting to print " \
                     "the job post information;  job id {}".format(job_id))
-        pass
-
     with open(filename, "a") as f:
         f.write(json.dumps(data) + '\n')
 
@@ -51,11 +44,9 @@ def get_date_time():
 
 def adjust_date_range(driver, date_range):
     """select a specific date range for job postings"""
-
     if date_range == 'All':
         return
     index = ['', 'All', '1', '2-7', '8-14', '15-30'].index(date_range)
-
     button_path = "html/body/div[3]/div/div[2]/div[1]/div[4]/form/div/ul/li" \
                   "[3]/fieldset/button"
     date_path = "html/body/div[3]/div/div[2]/div[1]/div[4]/form/div/ul/li" \
@@ -85,7 +76,6 @@ def adjust_search_radius(driver, search_radius):
         return
     distance_selector = "select#advs-distance > option[value='{}']"
     distance_selector = distance_selector.format(search_radius)
-
     try:
         driver.find_element_by_css_selector(distance_selector).click()
     except Exception as e:
@@ -100,12 +90,10 @@ def adjust_search_radius(driver, search_radius):
 
 def adjust_salary_range(driver, salary):
     """adjust the salary range, default is All salaries"""
-
     if salary == 'All': 
         return
     index = ['', 'All', '40+', '60+', '80+', '100+', 
                         '120+', '160+', '180+', '200+'].index(salary)
-
     salary_button = "html/body/div[3]/div/div[2]/div[1]/div[4]/form/div/ul/" \
                                     "li[4]/fieldset/button"
     salary_path = "html/body/div[3]/div/div[2]/div[1]/div[4]/" \
@@ -128,9 +116,8 @@ def adjust_salary_range(driver, salary):
 
 def sort_results_by(driver, sorting_criteria):
     """sort results by either relevance or date posted"""
-
-    if sorting_criteria == 'Relevance': return
-
+    if sorting_criteria == 'Relevance':
+        return
     button = "button.dropdown-trigger"
     option_path = "html/body/div[3]/div/div[2]/div[1]/div[5]/div[1]/" \
                                 "div[2]/form/ul/li[2]/label"

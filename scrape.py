@@ -10,8 +10,6 @@ import json
 import time
 
 
-
-
 def job_id(driver):
     """
     grabs the meta linkedin unique job id from the url
@@ -69,7 +67,6 @@ def job_data(driver):
     except Exception as e:
         print("error in attempting to click 'reveal details' button")
         print(e)
-
     for key, selector in job_info.iteritems():
         try:
             job_info[key] = driver.find_element_by_css_selector(selector).text
