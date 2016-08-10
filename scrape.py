@@ -22,14 +22,11 @@ def job_id(driver):
     url  = elem.get_attribute("content")
     return url[url.find('/', 34) + 1:]
 
-
 def parse_post_age(text):
         """ map 'posted 10 days ago' => '10' """
-
         if 'hours' in text:
             return '1'
         return filter(lambda c: c.isdigit(), text)
-
 
 def post_data(driver):
     """
@@ -37,29 +34,21 @@ def post_data(driver):
     so that 'posted 10 days ago' becomes '10'
     and '63 views' becomes '63' 
     """
-
     post_info = {
         "post_age"   : "li.posted", 
         "page_views" : "ul.posting-info li.views"
     }
-
     for key, selector in post_info.iteritems():
-
         try:
             text = driver.find_element_by_css_selector(selector).text
-
             if key == "post_age":
                 post_info[key] = parse_post_age(text)
-
             else:
                 post_info[key] = filter(lambda c: c.isdigit(), text)
-
         except Exception as e:
             post_info[key] = ""
             pass
-    
     return post_info
-
 
 def job_data(driver):
     """
@@ -68,93 +57,73 @@ def job_data(driver):
     job tite, company, location data, so have used many try-except
     statements to avoid potential errors with unicode, etc.
     """
-
     job_info = {
         "job_title"        :  "h1.title",
         "company"          :  "span.company",
         "location"         :  "h3.location",
         "employment_type"  :  "div.employment div.content div.rich-text"
     }
-
     # click the 'read more' button to reveal more about the job posting
     try:
         driver.find_element_by_css_selector("button#job-details-reveal").click()
-
     except Exception as e:
         print("error in attempting to click 'reveal details' button")
         print(e)
 
-
     for key, selector in job_info.iteritems():
-
         try:
             job_info[key] = driver.find_element_by_css_selector(selector).text
-
         except Exception as e:
             job_info[key] = ""
             pass
-
     return job_info
-
 
 def company_data(driver):
     """return company insights, number of employees and average tenure"""
-
     try:
         stats_selector = "ul.company-growth-stats.stats-list li"
-        company_stats = driver.find_elements_by_css_selector(stats_selector)
-        company_info  = [stat.text for stat in company_stats]
-        
+        company_stats  = driver.find_elements_by_css_selector(stats_selector)
+        company_info   = [stat.text for stat in company_stats]
     except Exception as e:
         print("error acquiring company info")
         print(e)
-
     else:
-        
         try:
             employees     = filter(lambda text: 'employees' in text, company_info)
             num_employees = filter(lambda c: c.isdigit(), employees[0])
         except Exception as e:
             num_employees = ""
             pass
-
         try:
             tenure        = filter(lambda text: 'tenure' in text, company_info)
             avg_tenure    = filter(lambda c: c in '0123456789.', tenure[0])
         except Exception as e:
             avg_tenure    = ""
             pass
-
         company_info  = {
             "avg_tenure"    : avg_tenure, 
             "num_employees" : num_employees
         }
-
     return {"avg_tenure" : avg_tenure, "num_employees" : num_employees}
-
 
 def salary_data(driver):
     """
     scrapes the salary info chart on the right panel returns lower, 
     upper bounds on salary estimate as well as average salary
     """
-
     try:
         _min = driver.find_element_by_css_selector("div.min-salary").text
         _max = driver.find_element_by_css_selector("div.max-salary").text
         _avg = driver.find_element_by_id("average-salary").text
-
         return {
             "min" : filter(lambda c: c.isdigit(), _min),
             "max" : filter(lambda c: c.isdigit(), _max),
             "avg" : filter(lambda c: c.isdigit(), _avg)
         }
-        
     except Exception as e:
         print("error acquiring salary info")
         print(e)
         pass
-
     return {"min": "", "max": "", "avg": ""}
 
 
@@ -164,7 +133,6 @@ def num_applicants(driver):
     applicants-insights div, or within the applicants-table in the same 
     div element. Returns empty string if data is not available.
     """
-
     # use two selectors since LI has two methods of showing number
     # of applicants in the applicants-insights driver
     num_applicant_selectors = [
@@ -172,33 +140,21 @@ def num_applicants(driver):
         "table.other-applicants-table.comparison-table tr td",
         "p.number-of-applicants"
     ]
-
     for selector in num_applicant_selectors:
-
         try:
             num_applicants = driver.find_element_by_css_selector(selector).text
-            
         except Exception as e:
             pass
-
         else:
             return filter(lambda c: c.isdigit(), num_applicants)
-    
     return ''
-
 
 def applicants_education(driver):
     """return dictionary of applicant education levels"""
-
-    education_selector = "table.applicants-education-table." \
-                         "comparison-table tbody tr"
-
+    education_selector = "table.applicants-education-table.comparison-table tbody tr"
     try:
-
         education = driver.find_elements_by_css_selector(education_selector)
-
         if education:
-
             # grab the degree type and proportion of applicants with that
             # degree.
             remove = ["have", "a", "Degree", "degrees", "(Similar", "to", "you)"]
@@ -209,7 +165,6 @@ def applicants_education(driver):
                         ), 
                     [item.text.split() for item in education]
                 )
-            
             # store the education levels in a dictionary and prepare to 
             # write it to file
             edu_dict = {
@@ -219,16 +174,11 @@ def applicants_education(driver):
                                 } 
                 for i in range(len(edu_map))
             }
-            
             return edu_dict
-
     except Exception as e:
         print("error acquiring applicants education")
         print(e)
-        pass
-
     return {}
-
 
 def applicants_locations(driver):
     """
@@ -236,34 +186,24 @@ def applicants_locations(driver):
     given job page. Grabs the location and number of applicants 
     from each location.
     """
-
     applicants_info = {}
-
     try:
         elem = driver.find_elements_by_css_selector("a.location-title")
-
         for i in range(len(elem)):
             # city and applicants are separated by a new line
             city, applicants = elem[i].text.split('\n')
-
             # get number of applicants by removing the word 'applicants'
             applicants = applicants[:applicants.find(" applicants")]
-
             # enter, typically, three applicant location data pairs
             location_data  = {
                 "city"       : city, 
                 "applicants" : applicants
             }
-
             applicants_info["location" + str(i + 1)] = location_data
-
     except Exception as e:
         print("error acquiring applicants locations")
         print(e)
-        pass
-
     return applicants_info
-
 
 def applicants_skills(driver):
     """
@@ -271,32 +211,23 @@ def applicants_skills(driver):
     returns list of skills. If skills not present on page, then
     returns empty list
     """
-
     try:
         raw_skills = driver.find_elements_by_css_selector("span.pill")
-        skills     = [skill.text for skill in raw_skills]
-        
+        skills     = [skill.text for skill in raw_skills] 
         return skills
-
     except Exception as e:
         print("error acquiring applicant skills")
         print(e)
-        pass
-
     return []
-
 
 def scrape_page(driver, **kwargs):
     """
     scrapes single job page after the driver loads a new job posting.
     Returns data as a dictionary
     """
-
     # wait ~1 second for elements to be dynamically rendered
     time.sleep(1.2)
-
     start = time.time()
-
     containers = [
         "section#top-card div.content",            # job content
         "div.job-salary-container",                # job salary
@@ -304,7 +235,6 @@ def scrape_page(driver, **kwargs):
         "div.insights-card.applicants-skills",     # applicants skills
         "div.applicants-locations-list"            # applicants locations
     ]
-
     for container in containers:
         try:
             WebDriverWait(driver, .25).until(
@@ -316,37 +246,27 @@ def scrape_page(driver, **kwargs):
             print("timeout error waiting for container to load or element" \
                   " not found: {}".format(container))
             print(e)
-
-
     applicant_info = {
         "num_applicants"    :  num_applicants(driver),
         "skills"            :  applicants_skills(driver),
         "education"         :  applicants_education(driver),
         "locations"         :  applicants_locations(driver)
     }
-
     job_info = {
         "job_id"            :  job_id(driver),
         "salary_estimates"  :  salary_data(driver),
         "company_info"      :  company_data(driver)
     }
-
     job_info.update(job_data(driver))
-
     data = {
         "applicant_info"    :  applicant_info,
         "job_info"          :  job_info,
         "post_info"         :  post_data(driver),
         "search_info"       :  kwargs
     }
-
     print("scraped page in  {}  seconds\n".format(time.time()-start))
-
     try:
         print("data:\n\n{}\n".format(data))
     except Exception as e:
         print("data could not be printed to console\n")
-
     return data
-
-
