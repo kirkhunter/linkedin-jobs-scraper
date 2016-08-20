@@ -161,7 +161,8 @@ def robust_wait_for_clickable_element(driver, delay, selector):
 
 def robust_click(driver, delay, selector):
     """
-    use a while-looop to click an element. For stubborn links.
+    use a while-looop to click an element. For stubborn links
+    and general unexpected browser errors.
     """
     try:
         driver.find_element_by_css_selector(selector).click()
@@ -182,6 +183,9 @@ def robust_click(driver, delay, selector):
                             "after {} attempts".format(attempts))
             finally:
                 attempts += 1
+                if attempts % 5 == 0:
+                    driver.refresh()
+                    time.sleep(3)
                 if attempts > 10**3:
                     print(selector)
                     print("  robust_click method failed after too many attempts")
