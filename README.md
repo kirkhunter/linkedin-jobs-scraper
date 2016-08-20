@@ -38,3 +38,7 @@ liclient.customize_search_results(**search_keys)
 liclient.navigate_search_results(keyword, location)
 liclient.driver_quit()
 ```
+Or with the command line:
+```bash
+$ python main.py --username uname --password pword --keyword "software" --location "san francisco bay area" --sort_by date
+```
