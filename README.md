@@ -30,15 +30,15 @@ liclient.login()
 # wait for page load
 time.sleep(3)
 
-keyword  = "data analyst"
-location = "san francisco bay area"
+liclient.keyword  = "data analyst"
+liclient.location = "san francisco bay area"
 liclient.navigate_to_jobs_page()
-liclient.enter_search_keys(keyword, location)
-liclient.customize_search_results(**search_keys)
-liclient.navigate_search_results(keyword, location)
+liclient.enter_search_keys()
+liclient.customize_search_results()
+liclient.navigate_search_results()
 liclient.driver_quit()
 ```
 Or with the command line:
 ```bash
-$ python main.py --username uname --password pword --keyword "software" --location "san francisco bay area" --sort_by date
+$ python main.py --username uname --password pword --keyword software --location "san francisco bay area" --sort_by date
 ```
