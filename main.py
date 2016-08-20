@@ -87,5 +87,4 @@ if __name__ == "__main__":
             liclient.customize_search_results()
             liclient.navigate_search_results()
 
-
     liclient.driver_quit()
