@@ -1,8 +1,4 @@
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from client import LIClient
 import argparse
 import time
@@ -18,12 +14,12 @@ def parse_command_line_args():
     parser.add_argument('--password', type=str, required=True, help="""
         enter LI password
         """)
-    parser.add_argument('--keywords', default=[''], nargs='*', 
+    parser.add_argument('--keyword', default=[''], nargs='*', 
         help="""
         enter search keys separated by a single space. If the keyword is more
         than one word, wrap the keyword in double quotes.
         """)
-    parser.add_argument('--locations', default=[''], nargs='*',
+    parser.add_argument('--location', default=[''], nargs='*',
         help="""
         enter search locations separated by a single space. If the location 
         search is more than one word, wrap the location in double quotes.
@@ -79,8 +75,8 @@ if __name__ == "__main__":
     # wait for page load
     time.sleep(3)
 
-    assert isinstance(search_keys["keywords"], list)
-    assert isinstance(search_keys["locations"], list)
+    assert isinstance(search_keys["keyword"], list)
+    assert isinstance(search_keys["location"], list)
 
     for keyword in search_keys["keywords"]:
         for location in search_keys["locations"]:
