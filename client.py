@@ -6,7 +6,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from scrape import *
-from settings import search_keys
 import datetime
 import json
 import time
@@ -116,23 +115,23 @@ def adjust_salary_range(driver, salary):
 
 def sort_results_by(driver, sorting_criteria):
     """sort results by either relevance or date posted"""
-    if sorting_criteria == 'Relevance':
+    if sorting_criteria.lower() == 'relevance':
         return
     button = "button.dropdown-trigger"
     option_path = "html/body/div[3]/div/div[2]/div[1]/div[5]/div[1]/" \
                                 "div[2]/form/ul/li[2]/label"
+    time.sleep(3)
     try:
-        time.sleep(3)
         driver.find_element_by_css_selector(button).click()
     except Exception as e:
         print(e)
         print("  Could not sort results by '{}'".format(sorting_criteria))
     else:
+        time.sleep(3)
         try:
-            time.sleep(3)
             driver.find_element_by_xpath(option_path).click()
         except Exception as e:
-            print("  Could not select sort by option")
+            print("  Could not select 'sort by' option")
         else:
             time.sleep(3)
 
@@ -269,16 +268,16 @@ def next_results_page(driver, delay):
         # wait for the first job post button to load
         wait_for_clickable_element(driver, delay, first_job_button)
 
-def go_to_specific_results_page(driver, delay, page_number):
+def go_to_specific_results_page(driver, delay, results_page):
     """
     go to a specific results page in case of an error, can restart 
     the webdriver where the error occurred.
     """
-    if page_number < 2:
+    if results_page < 2:
         return
-    results_page = 1
-    for i in range(page_number):
-        results_page += 1
+    current_page = 1
+    for i in range(results_page):
+        current_page += 1
         time.sleep(5)
         try:
             next_results_page(driver, delay)
@@ -289,7 +288,22 @@ def go_to_specific_results_page(driver, delay, page_number):
             print("**************************************************")
             print("\n\n\n\n\nSearch results exhausted\n\n\n\n\n")
 
-def extract_transform_load(driver, delay, selector, date, job, location, filename):
+def print_num_search_results(driver, keyword, location):
+    """print the number of search results to console"""
+    # scroll to top of page so first result is in view
+    driver.execute_script("window.scrollTo(0, 0);")
+    selector = "div.search-info p strong"
+    try:
+        num_results = driver.find_element_by_css_selector(selector).text
+    except Exception as e:
+        num_results = ''
+        pass
+    print("**************************************************")
+    print("\n\n\n\n\nSearching  {}  results for  '{}'  jobs in  '{}' " \
+            "\n\n\n\n\n".format(num_results, keyword, location))
+
+def extract_transform_load(driver, delay, selector, date, 
+                           keyword, location, filename):
     """
     using the next job posting selector on a given results page, wait for
     the link to become clickable, then navigate to it. Wait for the job 
@@ -316,7 +330,7 @@ def extract_transform_load(driver, delay, selector, date, job, location, filenam
 
     try:
         # scrape page and prepare to write the data to file
-        data = scrape_page(driver, keyword=job, location=location, dt=date)
+        data = scrape_page(driver, keyword=keyword, location=location, dt=date)
     except Exception as e:
         print("\nSearch results may have been exhausted. An error was " \
                 "encountered while attempting to scrape page data")
@@ -339,7 +353,7 @@ class LIClient(object):
         self.search_radius  =  kwargs["search_radius"]
         self.sort_by        =  kwargs["sort_by"]
         self.salary_range   =  kwargs["salary_range"]
-        self.page_number    =  kwargs["page_number"]
+        self.results_page    =  kwargs["results_page"]
 
     def driver_quit(self):
         self.driver.quit()
@@ -384,7 +398,7 @@ class LIClient(object):
                 print ("\n\n\nSuccessfully navigated to jobs search page\n\n\n")
                 jobs_link_clickable = True
 
-    def enter_search_keys(self, job='', location=''):
+    def enter_search_keys(self):
         """
         execute the job search by entering job and location information.
         The location is pre-filled with text, so we must clear it before
@@ -398,50 +412,40 @@ class LIClient(object):
         )
         # Enter search criteria
         elem = driver.find_element_by_id("keyword-search-box")
-        elem.send_keys(job)
+        elem.send_keys(self.keyword)
         # clear the text in the location box then enter location
         elem = driver.find_element_by_id("location-search-box").clear()
         elem = driver.find_element_by_id("location-search-box")
-        elem.send_keys(location)
+        elem.send_keys(self.location)
         elem.send_keys(Keys.RETURN)
         time.sleep(3)
 
-    def customize_search_results(self, job, location, **kwargs):
+    def customize_search_results(self):
         """sort results by either relevance or date posted"""
-        adjust_date_range(self.driver, kwargs["date_range"])
-        adjust_salary_range(self.driver, kwargs["salary_range"])
-        adjust_search_radius(self.driver, kwargs["search_radius"])
+        adjust_date_range(self.driver, self.date_range)
+        adjust_salary_range(self.driver, self.salary_range)
+        adjust_search_radius(self.driver, self.search_radius)
         # scroll to top of page so the sorting menu is in view
         self.driver.execute_script("window.scrollTo(0, 0);")
-        sort_results_by(self.driver, kwargs["sort_by"])
-        # scroll to top of page so first result is in view
-        self.driver.execute_script("window.scrollTo(0, 0);")
-        selector = "div.search-info p strong"
-        try:
-            num_results = driver.find_element_by_css_selector(selector).text
-        except Exception as e:
-            num_results = ''
-            pass
-        print("**************************************************")
-        print("\n\n\n\n\nSearching  {}  results for  '{}'  jobs in  '{}' " \
-                "\n\n\n\n\n".format(num_results, job, location))
+        sort_results_by(self.driver, self.sort_by)
 
-    def navigate_search_results(self, job, location):
+    def navigate_search_results(self):
         """
         scrape postings for all pages in search results
         """
         driver = self.driver
         search_results_exhausted = False
-        page_number = search_keys["page_number"]
+        results_page = self.results_page
         delay = 60
         date = get_date_time()
         # css elements to view job pages
         list_element_tag = "li.mod.result.idx"
         button_tag = ".job div.bd div.srp-actions.blue-button" \
                                  " a.primary-action-button.label"
+        print_num_search_results(driver, self.keyword, self.location)
         # go to a specific results page number if one is specified
-        go_to_specific_results_page(driver, delay, page_number)
-        results_page = page_number if page_number > 1 else 1
+        go_to_specific_results_page(driver, delay, results_page)
+        results_page = results_page if results_page > 1 else 1
 
         while not search_results_exhausted:
             for i in range(25):  # 25 results per page
@@ -457,12 +461,12 @@ class LIClient(object):
                                          job_selector, i, results_page):
                     continue
                 robust_wait_for_clickable_element(driver, delay, job_selector)
-                extract_transform_load(driver, 
-                                       delay, 
-                                       job_selector, 
-                                       date, 
-                                       job, 
-                                       location, 
+                extract_transform_load(driver,
+                                       delay,
+                                       job_selector,
+                                       date,
+                                       self.keyword,
+                                       self.location,
                                        self.filename)
             # attempt to navigate to the next page of search results
             # if the link is not present, then the search results have been 
