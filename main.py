@@ -78,8 +78,8 @@ if __name__ == "__main__":
     assert isinstance(search_keys["keyword"], list)
     assert isinstance(search_keys["location"], list)
 
-    for keyword in search_keys["keywords"]:
-        for location in search_keys["locations"]:
+    for keyword in search_keys["keyword"]:
+        for location in search_keys["location"]:
             liclient.keyword  = keyword
             liclient.location = location
             liclient.navigate_to_jobs_page()
