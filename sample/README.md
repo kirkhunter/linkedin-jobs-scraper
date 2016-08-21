@@ -1,6 +1,8 @@
 
 ## Sample data
 
+some output from scraping LI jobs for premium insights
+
 ```json
 {
 	"job_info": {
