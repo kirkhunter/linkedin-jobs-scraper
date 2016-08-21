@@ -1,7 +1,9 @@
 
 ## Sample data
 
-some output from scraping LI jobs for premium insights
+some output from scraping LI jobs for premium insights.
+
+below is an example of what one data point looks like.
 
 ```json
 {
