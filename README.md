@@ -14,6 +14,12 @@ $ pip install selenium
 
 Here is a quick demo of how one can use the LinkedIn client and scrape tools.
 
+From the command line:
+```bash
+$ python main.py --username uname --password pword --keyword software --location "san francisco bay area" --sort_by date
+```
+
+Or alter settings and run main
 ```python
 from selenium import webdriver
 from client import LIClient
@@ -37,8 +43,4 @@ liclient.enter_search_keys()
 liclient.customize_search_results()
 liclient.navigate_search_results()
 liclient.driver_quit()
-```
-Or from the command line:
-```bash
-$ python main.py --username uname --password pword --keyword software --location "san francisco bay area" --sort_by date
 ```
