@@ -8,10 +8,12 @@ def parse_command_line_args():
     parser = argparse.ArgumentParser(description="""
         parse LinkedIn search parameters
         """)
-    parser.add_argument('--username', type=str, required=True, help="""
+    parser.add_argument('--username', type=str, required=True, 
+        help="""
         enter LI username
         """)
-    parser.add_argument('--password', type=str, required=True, help="""
+    parser.add_argument('--password', type=str, required=True, 
+        help="""
         enter LI password
         """)
     parser.add_argument('--keyword', default=[''], nargs='*', 
@@ -38,12 +40,12 @@ def parse_command_line_args():
     parser.add_argument('--date_range', type=str, default='All', nargs='?', 
         help="""
         specify a specific date range. Possible values are: All, 1, 2-7, 8-14,
-        15-30. Defaults to All.
+        15-30. Defaults to 'All'.
         """)
     parser.add_argument('--sort_by', type=str, default='Relevance', nargs='?', 
         help="""
         sort results by relevance or date posted. If the input string is not 
-        equal to 'Relevance', case insensitive, then results will be sorted 
+        equal to 'Relevance' (case insensitive), then results will be sorted 
         by date posted. Defaults to sorting by relevance.
         """)
     parser.add_argument('--salary_range', type=str, default='All', nargs='?', 
