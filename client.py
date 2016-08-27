@@ -151,6 +151,8 @@ def robust_wait_for_clickable_element(driver, delay, selector):
             except Exception as e:
                 print("  {}".format(e))
                 attempts += 1
+                if attempts % 100 == 0:
+                    driver.refresh()
                 if attempts > 10**3: 
                     print("  \nrobust_wait_for_clickable_element failed " \
                                     "after too many attempts\n")
@@ -183,9 +185,10 @@ def robust_click(driver, delay, selector):
                             "after {} attempts".format(attempts))
             finally:
                 attempts += 1
-                if attempts % 5 == 0:
+                if attempts % 100 == 0:
+                    print("--------------  refreshing page")
                     driver.refresh()
-                    time.sleep(3)
+                    time.sleep(5)
                 if attempts > 10**3:
                     print(selector)
                     print("  robust_click method failed after too many attempts")
@@ -287,7 +290,7 @@ def go_to_specific_results_page(driver, delay, results_page):
             next_results_page(driver, delay)
             print("\n**************************************************")
             print("\n\n\nNavigating to results page {}" \
-                  "\n\n\n".format(results_page))
+                  "\n\n\n".format(current_page))
         except ValueError:
             print("**************************************************")
             print("\n\n\n\n\nSearch results exhausted\n\n\n\n\n")
@@ -357,7 +360,7 @@ class LIClient(object):
         self.search_radius  =  kwargs["search_radius"]
         self.sort_by        =  kwargs["sort_by"]
         self.salary_range   =  kwargs["salary_range"]
-        self.results_page    =  kwargs["results_page"]
+        self.results_page   =  kwargs["results_page"]
 
     def driver_quit(self):
         self.driver.quit()
