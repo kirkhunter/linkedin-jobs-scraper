@@ -14,7 +14,7 @@ search_keys = {
     "page_number"      :  1,
 
     # specify date range: 'All',  '1',  '2-7',  '8-14',  '15-30'
-    "date_range"       :  "8-14",
+    "date_range"       :  "All",
 
     # sort by either 'Relevance' or 'Date Posted'
     "sort_by"          :  "Date Posted",
