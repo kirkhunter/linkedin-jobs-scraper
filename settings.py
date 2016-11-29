@@ -1,8 +1,8 @@
 search_keys = { 
     "username"         :  "",
     "password"         :  "",
-    "keywords"         :  ["Software Engineer", "Data Scientist"],
-    "locations"        :  ["Sacramento, California Area", "San Francisco Bay Area"],
+    "keywords"         :  ["Data Scientist", "Data Analyst"],
+    "locations"        :  ["San Francisco Bay Area", "Greater New York City Area"],
 
     # specify the search radius from 'location' in miles:
     #    '10', '25', '35', '50', '75', '100'

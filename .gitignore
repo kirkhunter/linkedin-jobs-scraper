@@ -2,3 +2,4 @@
 !sample/*.txt
 *.pyc
 *.sh
+*.log
