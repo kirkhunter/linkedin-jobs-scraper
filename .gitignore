@@ -1,3 +1,4 @@
 *.txt
 !sample/*.txt
 *.pyc
+*.sh

@@ -58,7 +58,11 @@ def job_data(driver):
         "job_title"        :  "h1.title",
         "company"          :  "span.company",
         "location"         :  "h3.location",
-        "employment_type"  :  "div.employment div.content div.rich-text"
+        "employment_type"  :  "div.employment div.content div.rich-text",
+        "industry"         :  "div.industry div.content div.rich-text",
+        "experience"       :  "div.experience div.content div.rich-text",
+        "job_function"     :  "div.function div.content div.rich-text",
+        "description"      :  "div.summary div.content div.description-section div.rich-text"
     }
     # click the 'read more' button to reveal more about the job posting
     try:
