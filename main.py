@@ -66,7 +66,7 @@ if __name__ == "__main__":
     search_keys = parse_command_line_args()
 
     # initialize selenium webdriver
-    driver = webdriver.Chrome()
+    driver = webdriver.Chrome('/usr/bin/chromedriver')
     driver.get("https://www.linkedin.com/uas/login")
 
     # initialize LinkedIn web client
