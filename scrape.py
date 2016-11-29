@@ -23,7 +23,7 @@ def parse_post_age(text):
         """ map 'posted 10 days ago' => '10' """
         if 'hours' in text:
             return '1'
-        return filter(lambda c: c.isdigit(), text)
+        return list(filter(lambda c: c.isdigit(), text))
 
 def post_data(driver):
     """
@@ -35,13 +35,13 @@ def post_data(driver):
         "post_age"   : "li.posted", 
         "page_views" : "ul.posting-info li.views"
     }
-    for key, selector in post_info.iteritems():
+    for key, selector in post_info.items():
         try:
             text = driver.find_element_by_css_selector(selector).text
             if key == "post_age":
                 post_info[key] = parse_post_age(text)
             else:
-                post_info[key] = filter(lambda c: c.isdigit(), text)
+                post_info[key] = list(filter(lambda c: c.isdigit(), text))
         except Exception as e:
             post_info[key] = ""
             pass
@@ -70,7 +70,7 @@ def job_data(driver):
     except Exception as e:
         print("error in attempting to click 'reveal details' button")
         print(e)
-    for key, selector in job_info.iteritems():
+    for key, selector in job_info.items():
         try:
             job_info[key] = driver.find_element_by_css_selector(selector).text
         except Exception as e:
@@ -89,14 +89,14 @@ def company_data(driver):
         print(e)
     else:
         try:
-            employees     = filter(lambda text: 'employees' in text, company_info)
-            num_employees = filter(lambda c: c.isdigit(), employees[0])
+            employees     = list(filter(lambda text: 'employees' in text, company_info))
+            num_employees = list(filter(lambda c: c.isdigit(), employees[0]))
         except Exception as e:
             num_employees = ""
             pass
         try:
-            tenure        = filter(lambda text: 'tenure' in text, company_info)
-            avg_tenure    = filter(lambda c: c in '0123456789.', tenure[0])
+            tenure        = list(filter(lambda text: 'tenure' in text, company_info))
+            avg_tenure    = list(filter(lambda c: c in '0123456789.', tenure[0]))
         except Exception as e:
             avg_tenure    = ""
             pass
@@ -112,13 +112,11 @@ def salary_data(driver):
     upper bounds on salary estimate as well as average salary
     """
     try:
-        _min = driver.find_element_by_css_selector("div.min-salary").text
-        _max = driver.find_element_by_css_selector("div.max-salary").text
-        _avg = driver.find_element_by_id("average-salary").text
+        _base = driver.find_element_by_xpath('p[@class="salary-data-amount"][1]').text
+        _total = driver.find_element_by_xpath('p[@class="salary-data-amount"][2]').text
         return {
-            "min" : filter(lambda c: c.isdigit(), _min),
-            "max" : filter(lambda c: c.isdigit(), _max),
-            "avg" : filter(lambda c: c.isdigit(), _avg)
+            "min" : list(filter(lambda c: c.isdigit(), _base)),
+            "max" : list(filter(lambda c: c.isdigit(), _total))
         }
     except Exception as e:
         print("error acquiring salary info")
@@ -146,7 +144,7 @@ def num_applicants(driver):
         except Exception as e:
             pass
         else:
-            return filter(lambda c: c.isdigit(), num_applicants)
+            return list(filter(lambda c: c.isdigit(), num_applicants))
     return ''
 
 def applicants_education(driver):
@@ -158,13 +156,13 @@ def applicants_education(driver):
             # grab the degree type and proportion of applicants with that
             # degree.
             remove = ["have", "a", "Degree", "degrees", "(Similar", "to", "you)"]
-            edu_map = map(
-                    lambda edu: filter(
+            edu_map = list(map(
+                    lambda edu: list(filter(
                             lambda word: word not in remove, 
                             edu
-                        ), 
+                        )), 
                     [item.text.split() for item in education]
-                )
+                ))
             # store the education levels in a dictionary and prepare to 
             # write it to file
             edu_dict = {
@@ -265,8 +263,8 @@ def scrape_page(driver, **kwargs):
         "search_info"       :  kwargs
     }
     print("scraped page in  {}  seconds\n".format(time.time()-start))
-    try:
-        print("data:\n\n{}\n".format(data))
-    except Exception as e:
-        print("data could not be printed to console\n")
+    # try:
+    #     print("data:\n\n{}\n".format(data))
+    # except Exception as e:
+    #     print("data could not be printed to console\n")
     return data

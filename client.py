@@ -53,7 +53,7 @@ def adjust_date_range(driver, date_range):
     attempts = 1
     while True:
         try:
-            elem = driver.find_element_by_xpath(button_path)
+            elem = driver.find_element_by_css_selector(button_path)
             time.sleep(3)
         except Exception as e:
             attempts += 1
@@ -117,12 +117,11 @@ def sort_results_by(driver, sorting_criteria):
     """sort results by either relevance or date posted"""
     if sorting_criteria.lower() == 'relevance':
         return
-    button = "button.dropdown-trigger"
-    option_path = "html/body/div[3]/div/div[2]/div[1]/div[5]/div[1]/" \
-                                "div[2]/form/ul/li[2]/label"
+    button = '//select[@id="jserp-sort-select"]'
+    option_path = '//option[@value="DD"]'
     time.sleep(3)
     try:
-        driver.find_element_by_css_selector(button).click()
+        driver.find_element_by_xpath(button).click()
     except Exception as e:
         print(e)
         print("  Could not sort results by '{}'".format(sorting_criteria))
@@ -219,7 +218,7 @@ def link_is_present(driver, delay, selector, index, results_page):
         )
         print("**************************************************")
         print("\nScraping data for result  {}" \
-                "  on results page  {} \n".format(index + 1, results_page))
+                "  on results page  {} \n".format(index, results_page))
     except Exception as e:
         print(e)
         if index < 24:
@@ -299,12 +298,11 @@ def print_num_search_results(driver, keyword, location):
     """print the number of search results to console"""
     # scroll to top of page so first result is in view
     driver.execute_script("window.scrollTo(0, 0);")
-    selector = "div.search-info p strong"
+    selector = "div.results-context div strong"
     try:
         num_results = driver.find_element_by_css_selector(selector).text
     except Exception as e:
         num_results = ''
-        pass
     print("**************************************************")
     print("\n\n\n\n\nSearching  {}  results for  '{}'  jobs in  '{}' " \
             "\n\n\n\n\n".format(num_results, keyword, location))
@@ -431,7 +429,7 @@ class LIClient(object):
         """sort results by either relevance or date posted"""
         adjust_date_range(self.driver, self.date_range)
         adjust_salary_range(self.driver, self.salary_range)
-        adjust_search_radius(self.driver, self.search_radius)
+        # adjust_search_radius(self.driver, self.search_radius) # deprecated
         # scroll to top of page so the sorting menu is in view
         self.driver.execute_script("window.scrollTo(0, 0);")
         sort_results_by(self.driver, self.sort_by)
@@ -446,18 +444,16 @@ class LIClient(object):
         delay = 60
         date = get_date_time()
         # css elements to view job pages
-        list_element_tag = "li.mod.result.idx"
-        button_tag = ".job div.bd div.srp-actions.blue-button" \
-                                 " a.primary-action-button.label"
+        list_element_tag = ".job-title-link:nth-of-type("
         print_num_search_results(driver, self.keyword, self.location)
         # go to a specific results page number if one is specified
         go_to_specific_results_page(driver, delay, results_page)
         results_page = results_page if results_page > 1 else 1
 
         while not search_results_exhausted:
-            for i in range(25):  # 25 results per page
+            for i in range(1,26):  # 25 results per page
                 # define the css selector for the blue 'View' button for job i
-                job_selector = list_element_tag + str(i) + button_tag
+                job_selector = list_element_tag + str(i) + ')'
                 if search_suggestion_box_is_present(driver, 
                                             job_selector, i, results_page):
                     continue
