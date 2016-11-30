@@ -268,18 +268,16 @@ def next_results_page(driver, delay):
         print("  Moving to the next page of search results... \n" \
                 "  If search results are exhausted, will wait {} seconds " \
                 "then either execute new search or quit".format(delay))
-        wait_for_clickable_element_css(driver, delay, "li.next a.page-link")
+        wait_for_clickable_element_css(driver, delay, "a.next-btn")
         # navigate to next page
-        driver.find_element_by_css_selector("li.next a.page-link").click()
+        driver.find_element_by_css_selector("a.next-btn").click()
     except Exception as e:
         print ("\nFailed to click next page link; Search results " \
                                 "may have been exhausted\n{}".format(e))
         raise ValueError("Next page link not detected; search results exhausted")
     else:
         # wait until the first job post button has loaded
-        first_job_button = "li.mod.result.idx1.job div.bd " \
-                            "div.srp-actions.blue-button a" \
-                            ".primary-action-button.label"
+        first_job_button = "a.job-title-link"
         # wait for the first job post button to load
         wait_for_clickable_element_css(driver, delay, first_job_button)
 
