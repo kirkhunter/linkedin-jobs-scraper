@@ -112,8 +112,8 @@ def salary_data(driver):
     upper bounds on salary estimate as well as average salary
     """
     try:
-        _base = driver.find_element_by_xpath('p[@class="salary-data-amount"][1]').text
-        _total = driver.find_element_by_xpath('p[@class="salary-data-amount"][2]').text
+        _base = driver.find_element_by_xpath('/descendant::p[@class="salary-data-amount"][1]').text
+        _total = driver.find_element_by_xpath('/descendant::p[@class="salary-data-amount"][2]').text
         return {
             "min" : list(filter(lambda c: c.isdigit(), _base)),
             "max" : list(filter(lambda c: c.isdigit(), _total))
