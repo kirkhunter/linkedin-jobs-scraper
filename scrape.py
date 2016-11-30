@@ -23,7 +23,7 @@ def parse_post_age(text):
         """ map 'posted 10 days ago' => '10' """
         if 'hours' in text:
             return '1'
-        return list(filter(lambda c: c.isdigit(), text))
+        return ''.join(list(filter(lambda c: c.isdigit(), text)))
 
 def post_data(driver):
     """
@@ -41,7 +41,7 @@ def post_data(driver):
             if key == "post_age":
                 post_info[key] = parse_post_age(text)
             else:
-                post_info[key] = list(filter(lambda c: c.isdigit(), text))
+                post_info[key] = ''.join(list(filter(lambda c: c.isdigit(), text)))
         except Exception as e:
             post_info[key] = ""
             pass
@@ -90,13 +90,13 @@ def company_data(driver):
     else:
         try:
             employees     = list(filter(lambda text: 'employees' in text, company_info))
-            num_employees = list(filter(lambda c: c.isdigit(), employees[0]))
+            num_employees = ''.join(list(filter(lambda c: c.isdigit(), employees[0])))
         except Exception as e:
             num_employees = ""
             pass
         try:
             tenure        = list(filter(lambda text: 'tenure' in text, company_info))
-            avg_tenure    = list(filter(lambda c: c in '0123456789.', tenure[0]))
+            avg_tenure    = ''.join(list(filter(lambda c: c in '0123456789.', tenure[0])))
         except Exception as e:
             avg_tenure    = ""
             pass
@@ -114,15 +114,19 @@ def salary_data(driver):
     try:
         _base = driver.find_element_by_xpath('/descendant::p[@class="salary-data-amount"][1]').text
         _total = driver.find_element_by_xpath('/descendant::p[@class="salary-data-amount"][2]').text
+        _base_range = driver.find_element_by_xpath('/descendant::p[@class="salary-data-range"][1]').text
+        _total_range = driver.find_element_by_xpath('/descendant::p[@class="salary-data-range"][2]').text
         return {
-            "min" : list(filter(lambda c: c.isdigit(), _base)),
-            "max" : list(filter(lambda c: c.isdigit(), _total))
+            "base" : ''.join(list(filter(lambda c: c.isdigit(), _base))),
+            "total" : ''.join(list(filter(lambda c: c.isdigit(), _total))),
+            "base_range": _base_range,
+            "total_range": _total_range
         }
     except Exception as e:
         print("error acquiring salary info")
         print(e)
         pass
-    return {"min": "", "max": "", "avg": ""}
+    return {"base": "", "total": "", "base_range": "", "total_range": ""}
 
 
 def num_applicants(driver):
@@ -144,7 +148,7 @@ def num_applicants(driver):
         except Exception as e:
             pass
         else:
-            return list(filter(lambda c: c.isdigit(), num_applicants))
+            return ''.join(list(filter(lambda c: c.isdigit(), num_applicants)))
     return ''
 
 def applicants_education(driver):
