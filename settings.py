@@ -1,8 +1,8 @@
 search_keys = { 
     "username"         :  "",
     "password"         :  "",
-    "keywords"         :  ["Software Engineer", "Data Scientist"],
-    "locations"        :  ["Sacramento, California Area", "San Francisco Bay Area"],
+    "keywords"         :  ["Data Scientist", "Data Analyst"],
+    "locations"        :  ["San Francisco Bay Area", "Greater New York City Area"],
 
     # specify the search radius from 'location' in miles:
     #    '10', '25', '35', '50', '75', '100'
@@ -14,7 +14,7 @@ search_keys = {
     "page_number"      :  1,
 
     # specify date range: 'All',  '1',  '2-7',  '8-14',  '15-30'
-    "date_range"       :  "8-14",
+    "date_range"       :  "All",
 
     # sort by either 'Relevance' or 'Date Posted'
     "sort_by"          :  "Date Posted",

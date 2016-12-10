@@ -117,12 +117,11 @@ def sort_results_by(driver, sorting_criteria):
     """sort results by either relevance or date posted"""
     if sorting_criteria.lower() == 'relevance':
         return
-    button = "button.dropdown-trigger"
-    option_path = "html/body/div[3]/div/div[2]/div[1]/div[5]/div[1]/" \
-                                "div[2]/form/ul/li[2]/label"
+    button = '//select[@id="jserp-sort-select"]'
+    option_path = '//option[@value="DD"]'
     time.sleep(3)
     try:
-        driver.find_element_by_css_selector(button).click()
+        driver.find_element_by_xpath(button).click()
     except Exception as e:
         print(e)
         print("  Could not sort results by '{}'".format(sorting_criteria))
@@ -140,7 +139,7 @@ def robust_wait_for_clickable_element(driver, delay, selector):
     clickable = False
     attempts = 1
     try:
-        driver.find_element_by_css_selector(selector)
+        driver.find_element_by_xpath(selector)
     except Exception as e:
         print("  Selector not found: {}".format(selector))
     else:
@@ -167,7 +166,7 @@ def robust_click(driver, delay, selector):
     and general unexpected browser errors.
     """
     try:
-        driver.find_element_by_css_selector(selector).click()
+        driver.find_element_by_xpath(selector).click()
     except Exception as e:
         print("  The job post link was likely hidden,\n    An " \
                 "error was encountered while attempting to click link" \
@@ -176,7 +175,7 @@ def robust_click(driver, delay, selector):
         clicked = False
         while not clicked:
             try:
-                driver.find_element_by_css_selector(selector).click()
+                driver.find_element_by_xpath(selector).click()
             except Exception as e:
                 pass
             else:
@@ -199,6 +198,15 @@ def wait_for_clickable_element(driver, delay, selector):
     """use WebDriverWait to wait for an element to become clickable"""
     obj = WebDriverWait(driver, delay).until(
             EC.element_to_be_clickable(
+                (By.XPATH, selector)
+            )
+        )
+    return obj  
+
+def wait_for_clickable_element_css(driver, delay, selector):
+    """use WebDriverWait to wait for an element to become clickable"""
+    obj = WebDriverWait(driver, delay).until(
+            EC.element_to_be_clickable(
                 (By.CSS_SELECTOR, selector)
             )
         )
@@ -214,15 +222,15 @@ def link_is_present(driver, delay, selector, index, results_page):
     try:
         WebDriverWait(driver, delay).until(
             EC.presence_of_element_located(
-                (By.CSS_SELECTOR, selector)
+                (By.XPATH, selector)
             )
         )
         print("**************************************************")
         print("\nScraping data for result  {}" \
-                "  on results page  {} \n".format(index + 1, results_page))
+                "  on results page  {} \n".format(index, results_page))
     except Exception as e:
         print(e)
-        if index < 24:
+        if index < 25:
             print("\nWas not able to wait for job_selector to load. Search " \
                     "results may have been exhausted.")
             return True
@@ -237,7 +245,7 @@ def search_suggestion_box_is_present(driver, selector, index, results_page):
     check results page for the search suggestion box,
     as this causes some errors in navigate search results.
     """
-    if (index == 0) and (results_page == 1):
+    if (index == 1) and (results_page == 1):
         try:
             # This try-except statement allows us to avoid the 
             # problems cause by the LinkedIn search suggestion box
@@ -260,20 +268,18 @@ def next_results_page(driver, delay):
         print("  Moving to the next page of search results... \n" \
                 "  If search results are exhausted, will wait {} seconds " \
                 "then either execute new search or quit".format(delay))
-        wait_for_clickable_element(driver, delay, "li.next a.page-link")
+        wait_for_clickable_element_css(driver, delay, "a.next-btn")
         # navigate to next page
-        driver.find_element_by_css_selector("li.next a.page-link").click()
+        driver.find_element_by_css_selector("a.next-btn").click()
     except Exception as e:
         print ("\nFailed to click next page link; Search results " \
                                 "may have been exhausted\n{}".format(e))
         raise ValueError("Next page link not detected; search results exhausted")
     else:
         # wait until the first job post button has loaded
-        first_job_button = "li.mod.result.idx1.job div.bd " \
-                            "div.srp-actions.blue-button a" \
-                            ".primary-action-button.label"
+        first_job_button = "a.job-title-link"
         # wait for the first job post button to load
-        wait_for_clickable_element(driver, delay, first_job_button)
+        wait_for_clickable_element_css(driver, delay, first_job_button)
 
 def go_to_specific_results_page(driver, delay, results_page):
     """
@@ -299,12 +305,11 @@ def print_num_search_results(driver, keyword, location):
     """print the number of search results to console"""
     # scroll to top of page so first result is in view
     driver.execute_script("window.scrollTo(0, 0);")
-    selector = "div.search-info p strong"
+    selector = "div.results-context div strong"
     try:
         num_results = driver.find_element_by_css_selector(selector).text
     except Exception as e:
         num_results = ''
-        pass
     print("**************************************************")
     print("\n\n\n\n\nSearching  {}  results for  '{}'  jobs in  '{}' " \
             "\n\n\n\n\n".format(num_results, keyword, location))
@@ -431,7 +436,7 @@ class LIClient(object):
         """sort results by either relevance or date posted"""
         adjust_date_range(self.driver, self.date_range)
         adjust_salary_range(self.driver, self.salary_range)
-        adjust_search_radius(self.driver, self.search_radius)
+        # adjust_search_radius(self.driver, self.search_radius) # deprecated
         # scroll to top of page so the sorting menu is in view
         self.driver.execute_script("window.scrollTo(0, 0);")
         sort_results_by(self.driver, self.sort_by)
@@ -446,18 +451,16 @@ class LIClient(object):
         delay = 60
         date = get_date_time()
         # css elements to view job pages
-        list_element_tag = "li.mod.result.idx"
-        button_tag = ".job div.bd div.srp-actions.blue-button" \
-                                 " a.primary-action-button.label"
+        list_element_tag = '/descendant::a[@class="job-title-link"]['
         print_num_search_results(driver, self.keyword, self.location)
         # go to a specific results page number if one is specified
         go_to_specific_results_page(driver, delay, results_page)
         results_page = results_page if results_page > 1 else 1
 
         while not search_results_exhausted:
-            for i in range(25):  # 25 results per page
+            for i in range(1,26):  # 25 results per page
                 # define the css selector for the blue 'View' button for job i
-                job_selector = list_element_tag + str(i) + button_tag
+                job_selector = list_element_tag + str(i) + ']'
                 if search_suggestion_box_is_present(driver, 
                                             job_selector, i, results_page):
                     continue
